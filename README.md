@@ -4,6 +4,8 @@ Kotlin Roguelike with Kotter
 
 [Roguelike](https://en.wikipedia.org/wiki/Roguelike) sample using [Kotter](https://github.com/varabyte/kotter) terminal library
 
+`./gradlew run`
+
 Press Q (shift-q) to quit terminal
 
 ---
