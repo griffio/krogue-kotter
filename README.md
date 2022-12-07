@@ -1,4 +1,4 @@
-#Kroguelike#
+# Krogue
 
 Kotlin Roguelike with Kotter
 
@@ -10,9 +10,8 @@ Press Q (shift-q) to quit terminal
 
 ![Krogue](krogue-cap.gif "Krogue")
 
-
 ---
-##References#
+## References
 
 [roguelikes](https://jeremyceri.se/roguelikes/)
 
