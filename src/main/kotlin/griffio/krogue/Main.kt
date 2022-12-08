@@ -74,6 +74,9 @@ fun main() = session(
     val padTop = (HEIGHT - HEIGHT / 2) / 2
     var blinkOn by liveVarOf(false)
     section {
+        textLine("Move hero with w a s d or Q to quit")
+    }.run()
+    section {
         // section is rendered on each move
 
         for ((indexY, row) in world.withIndex()) {
