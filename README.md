@@ -15,6 +15,16 @@ Press Q (shift-q) to quit terminal
 ![Krogue](krogue-cap.gif "Krogue")
 
 ---
+
+## Todo
+
+- [ ] Add Health Points to Hero
+- [ ] Add Time Limit
+- [ ] Hero takes damage from water and lava
+- [ ] Find Treasure before running out of health and time
+
+---
+
 ## References
 
 [roguelikes](https://jeremyceri.se/roguelikes/)
