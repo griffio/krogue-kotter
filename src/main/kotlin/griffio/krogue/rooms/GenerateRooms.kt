@@ -2,7 +2,7 @@ package griffio.krogue.rooms
 
 import kotlin.math.max
 import kotlin.math.min
-
+// https://github.com/pushcx/ironwood/blob/master/gen_map.rb
 const val MIN_DIM = 2
 const val MAX_DIM = 9
 val ROOM_DISTANCES = arrayOf(1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5)
@@ -62,11 +62,11 @@ fun generateRooms(): List<List<Char>> {
                 right = left + widthDim
                 digRoom(top, bottom, left, right)
                 val x = (max(left, from.left)..min(right, from.right)).random()
-                for (y in (bottom..from.top)) {
+                for (y in (from.bottom..top)) {
                     tiles[y][x] = '.'
                 }
 
-                if (from.top - bottom == 2 && tiles[top - 1][x - 1] == '#' && tiles[top - 1][x + 1] == '#') {
+                if (top - from.bottom == 2 && tiles[top - 1][x - 1] == '#' && tiles[top - 1][x + 1] == '#') {
                     tiles[top - 1][x] = '~'
                 }
             }

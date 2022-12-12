@@ -15,16 +15,17 @@ import com.varabyte.kotter.terminal.virtual.VirtualTerminal
 import com.varabyte.kotterx.decorations.BorderCharacters
 import com.varabyte.kotterx.decorations.bordered
 import com.varabyte.kotterx.text.shiftRight
-import griffio.krogue.tiles.tiles01
+import griffio.krogue.rooms.generateRooms
 import java.time.Duration
 
-val world: List<MutableList<Tile>> = tiles01.map { line ->
+val world: List<MutableList<Tile>> = generateRooms().map { line ->
     line.map {
         when (it) {
             '#' -> Cave()
             '.' -> Floor()
             '^' -> Lava()
             '~' -> Water()
+            '@' -> Hero
             else -> error("Unknown tile: $it")
         }
     }.toMutableList()
@@ -34,9 +35,11 @@ data class View(val min: Int, val max: Int)
 
 infix fun Int.xy(that: Int): View = View(this, that)
 
-fun incView(current: View, max: Int) = if (current.max < max) current.min + 1 xy current.max + 1 else current
+fun incView(current: View, inc: Int, max: Int) =
+    if (current.max < max) current.min + inc xy current.max + inc else current
 
-fun decView(current: View, min: Int) = if (current.min > min) current.min - 1 xy current.max - 1 else current
+fun decView(current: View, dec: Int, min: Int) =
+    if (current.min > min) current.min - dec xy current.max - dec else current
 
 // https://en.wikipedia.org/wiki/ANSI_escape_code (Standard colors/High-intensity colors)
 sealed class Tile(val glyph: Char, val colorIndex: Int, var isVisible: Boolean, var isOpaque: Boolean)
@@ -68,8 +71,8 @@ fun main() = session(
     val yMaxIndex = HEIGHT - 1
     var xView by liveVarOf(0 xy xMaxIndex / 2)
     var yView by liveVarOf(0 xy yMaxIndex / 2)
-    var xhero by liveVarOf(10)
-    var yhero by liveVarOf(1)
+    var xhero by liveVarOf(xMaxIndex / 4)
+    var yhero by liveVarOf(yMaxIndex / 4)
     val padRight = (WIDTH - WIDTH / 2) / 2
     val padTop = (HEIGHT - HEIGHT / 2) / 2
     var blinkOn by liveVarOf(false)
@@ -122,7 +125,7 @@ fun main() = session(
                         val yMinPrev = yView.min
 
                         // the hero is "fixed" to middle of the view unless near the edges where the view is "fixed"
-                        yView = if (yhero == yMaxIndex / 4) decView(yView, 0) else yView
+                        yView = if (yhero == yMaxIndex / 4) decView(yView, 1, 0) else yView
 
                         // the hero is allowed to move to the edges when the view is scrolled to max range
                         yhero = (if (yView.max == yMaxIndex || yMinPrev == 0) (yhero - 1).coerceAtLeast(0) else yhero)
@@ -133,7 +136,7 @@ fun main() = session(
 
                         val yPrev = yView.max
 
-                        yView = if (yhero == yMaxIndex / 4) incView(yView, yMaxIndex) else yView
+                        yView = if (yhero == yMaxIndex / 4) incView(yView, 1, yMaxIndex) else yView
 
                         yhero =
                             (if (yView.min == 0 || yPrev == yMaxIndex) (yhero + 1).coerceAtMost(yMaxIndex) else yhero)
@@ -144,7 +147,7 @@ fun main() = session(
 
                         val xPrev = xView.min
 
-                        xView = if (xhero == xMaxIndex / 4) decView(xView, 0) else xView
+                        xView = if (xhero == xMaxIndex / 4) decView(xView, 1, 0) else xView
 
                         xhero = (if (xView.max == xMaxIndex || xPrev == 0) (xhero - 1).coerceAtLeast(0) else xhero)
                     }
@@ -154,7 +157,7 @@ fun main() = session(
 
                         val xPrev = xView.max
 
-                        xView = if (xhero == xMaxIndex / 4) incView(xView, xMaxIndex) else xView
+                        xView = if (xhero == xMaxIndex / 4) incView(xView, 1, xMaxIndex) else xView
 
                         xhero =
                             (if (xView.min == 0 || xPrev == xMaxIndex) (xhero + 1).coerceAtMost(xMaxIndex) else xhero)
