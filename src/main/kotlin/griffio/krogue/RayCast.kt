@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalStdlibApi::class)
+
 package griffio.krogue
 
 import kotlin.math.PI
@@ -10,18 +12,18 @@ import kotlin.math.sin
 object RayCast {
 
     private val cosTable = LinkedHashMap<Int, Double>().apply {
-        for (i in 0 until 360) {
+        for (i in 0..<360) {
             put(i, 0.0)
         }
     }
     private val sinTable = LinkedHashMap<Int, Double>().apply {
-        for (i in 0 until 360) {
+        for (i in 0..<360) {
             put(i, 0.0)
         }
     }
 
     init {
-        for (i in 0 until 360) {
+        for (i in 0..<360) {
             val ax = sin(i.toDouble() / (180.0 / PI))
             val ay = cos(i.toDouble() / (180.0 / PI))
             sinTable[i] = ax
@@ -33,7 +35,7 @@ object RayCast {
         val worldMaxX = view[0].size - 1
         val worldMaxY = view.size - 1
 
-        for (i in 0 until 360) {
+        for (i in 0..<360) {
             val ax = sinTable[i]!!
             val ay = cosTable[i]!!
 
