@@ -56,58 +56,39 @@ fun RenderScope.statusPanels(
     val healthContent = StatusPanel(paddingLeftRight, paddingTopBottom, offscreen(health))
     val cashContent = StatusPanel(paddingLeftRight, paddingTopBottom, offscreen(cash), endOfLine = true)
 
-    green(isBright = true) {
-        statusPanelBorderPadding(
-            healthContent,
-            healthContent.borderCharacters.topLeft,
-            healthContent.borderCharacters.topRight
-        )
-    }
+    statusPanelBorderPadding(
+        healthContent,
+        healthContent.borderCharacters.topLeft,
+        healthContent.borderCharacters.topRight
+    )
 
-    yellow(isBright = true) {
-        statusPanelBorderPadding(
-            cashContent,
-            cashContent.borderCharacters.topLeft,
-            cashContent.borderCharacters.topRight
-        )
-    }
+    statusPanelBorderPadding(
+        cashContent,
+        cashContent.borderCharacters.topLeft,
+        cashContent.borderCharacters.topRight
+    )
 
-    green(isBright = true) {
-        statusPanelVerticalPadding(healthContent)
-    }
+    statusPanelVerticalPadding(healthContent)
 
-    yellow(isBright = true) {
-        statusPanelVerticalPadding(cashContent)
-    }
+    statusPanelVerticalPadding(cashContent)
 
-    green(isBright = true) {
-        statusPanelRender(healthContent)
-    }
+    statusPanelRender(healthContent)
 
-    yellow(isBright = true) {
-        statusPanelRender(cashContent)
-    }
+    statusPanelRender(cashContent)
 
-    green(isBright = true) {
-        statusPanelVerticalPadding(healthContent)
-    }
-    yellow(isBright = true) {
-        statusPanelVerticalPadding(healthContent)
-    }
+    statusPanelVerticalPadding(healthContent)
 
-    green(isBright = true) {
-        statusPanelBorderPadding(
-            healthContent,
-            healthContent.borderCharacters.botLeft,
-            healthContent.borderCharacters.botRight
-        )
-    }
+    statusPanelVerticalPadding(healthContent)
 
-    yellow(isBright = true) {
-        statusPanelBorderPadding(
-            cashContent,
-            cashContent.borderCharacters.botLeft,
-            cashContent.borderCharacters.botRight
-        )
-    }
+    statusPanelBorderPadding(
+        healthContent,
+        healthContent.borderCharacters.botLeft,
+        healthContent.borderCharacters.botRight
+    )
+
+    statusPanelBorderPadding(
+        cashContent,
+        cashContent.borderCharacters.botLeft,
+        cashContent.borderCharacters.botRight
+    )
 }
