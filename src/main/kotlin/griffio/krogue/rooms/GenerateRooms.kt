@@ -2,6 +2,7 @@ package griffio.krogue.rooms
 
 import kotlin.math.max
 import kotlin.math.min
+
 // https://github.com/pushcx/ironwood/blob/master/gen_map.rb
 const val MIN_DIM = 2
 const val MAX_DIM = 9
@@ -10,6 +11,8 @@ val dimensions = (60..100)
 var tiles = mutableListOf<MutableList<Char>>()
 
 var rooms = mutableListOf<Room>()
+
+const val TOTAL_CASH = 10
 
 fun generateRooms(): List<List<Char>> {
     val width = dimensions.random()
@@ -117,7 +120,14 @@ fun generateRooms(): List<List<Char>> {
 
     }
 
+    repeat(TOTAL_CASH) {
+        addTreasure(rooms.random())
+    }
     return tiles
+}
+
+fun addTreasure(room: Room) {
+    tiles[room.bottom / 2][room.right / 2] = '£'
 }
 
 fun digRoom(top: Int, bottom: Int, left: Int, right: Int) {
