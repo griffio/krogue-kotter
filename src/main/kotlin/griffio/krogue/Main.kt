@@ -89,8 +89,6 @@ fun main() = session(
     var healthPoints by liveVarOf((8..16).random())
     var cash by liveVarOf(0)
 
-    // val spinnerAnim = textAnimOf(listOf("\\", "|", "/", "-"), Duration.ofMillis(125))
-
     fun tryMoveHero(tile: Tile, move: () -> Unit) {
         if (tile is Cash) {
             cash += 1
@@ -124,9 +122,18 @@ fun main() = session(
 
         RayCast.renderHeroRadius(xhero, yhero, view, 6)
 
+        val healthText = "Health: $healthPoints"
+        val cashText = "Cash: $cash of $TOTAL_CASH"
+
         statusPanels(
-            health = { text("Health: $healthPoints") },
-            cash = { text("Cash: $cash of $TOTAL_CASH") }
+            health = {
+                when {
+                    healthPoints < 1 -> red(isBright = true) { text(healthText) }
+                    healthPoints < 6 -> yellow(isBright = true) { text(healthText) }
+                    else -> green(isBright = true) { text(healthText) }
+                }
+            },
+            cash = { yellow(isBright = true) { text(cashText) } }
         )
         cyan {
             bordered(BorderCharacters.CURVED, paddingLeftRight = 1, paddingTopBottom = 1) {
