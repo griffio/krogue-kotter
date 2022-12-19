@@ -49,7 +49,7 @@ fun decView(current: View, dec: Int, min: Int) =
 // https://en.wikipedia.org/wiki/ANSI_escape_code (Standard colors/High-intensity colors)
 sealed class Tile(
     val glyph: Char,
-    val colorIndex: Int,
+    var colorIndex: Int,
     var isVisible: Boolean,
     var isOpaque: Boolean,
     var isTaken: Boolean,
@@ -90,6 +90,12 @@ fun main() = session(
     var cash by liveVarOf(0)
 
     fun tryMoveHero(tile: Tile, move: () -> Unit) {
+
+        if (healthPoints < 1) {
+            Hero.colorIndex = 9
+            return
+        }
+
         if (tile is Cash) {
             cash += 1
             tile.isTaken = true
