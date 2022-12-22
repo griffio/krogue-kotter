@@ -61,7 +61,7 @@ class Lava() : Tile('^', 9, false, false, false)
 class Water() : Tile('~', 14, false, false, false)
 class Cash() : Tile('£', 11, false, false, false)
 object Empty : Tile(' ', 0, false, false, false)
-object Hero : Tile('@', 11, false, false, false)
+object Hero : Tile('@', 10, false, false, false)
 
 fun RenderScope.render(t: Tile, isInverted: Boolean) {
     if (isInverted) invert()
@@ -132,14 +132,16 @@ fun main() = session(
         val cashText = "Cash: $cash of $TOTAL_CASH"
 
         statusPanels(
-            health = {
+            leftColor = {
                 when {
-                    healthPoints < 1 -> red(isBright = true) { text(healthText) }
-                    healthPoints < 6 -> yellow(isBright = true) { text(healthText) }
-                    else -> green(isBright = true) { text(healthText) }
+                    healthPoints < 1 -> red(isBright = true)
+                    healthPoints < 6 -> yellow(isBright = true)
+                    else -> green(isBright = true)
                 }
             },
-            cash = { yellow(isBright = true) { text(cashText) } }
+            leftText = { text(healthText) },
+            rightColor = { yellow(isBright = true) },
+            rightText = { text(cashText) }
         )
         cyan {
             bordered(BorderCharacters.CURVED, paddingLeftRight = 1, paddingTopBottom = 1) {
