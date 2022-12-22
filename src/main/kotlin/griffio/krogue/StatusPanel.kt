@@ -1,12 +1,8 @@
 package griffio.krogue
 
 import com.varabyte.kotter.foundation.render.OffscreenBuffer
-import com.varabyte.kotter.foundation.render.OffscreenRenderScope
 import com.varabyte.kotter.foundation.render.offscreen
-import com.varabyte.kotter.foundation.text.green
-import com.varabyte.kotter.foundation.text.text
-import com.varabyte.kotter.foundation.text.textLine
-import com.varabyte.kotter.foundation.text.yellow
+import com.varabyte.kotter.foundation.text.*
 import com.varabyte.kotter.runtime.render.RenderScope
 import com.varabyte.kotterx.decorations.BorderCharacters
 
@@ -50,45 +46,77 @@ fun RenderScope.statusPanelRender(statusPanel: StatusPanel) {
 fun RenderScope.statusPanels(
     paddingLeftRight: Int = 0,
     paddingTopBottom: Int = 0,
-    health: OffscreenRenderScope.() -> Unit,
-    cash: OffscreenRenderScope.() -> Unit,
+    leftColor: RenderScope.() -> Unit,
+    leftText: RenderScope.() -> Unit,
+    rightColor: RenderScope.() -> Unit,
+    rightText: RenderScope.() -> Unit,
 ) {
-    val healthContent = StatusPanel(paddingLeftRight, paddingTopBottom, offscreen(health))
-    val cashContent = StatusPanel(paddingLeftRight, paddingTopBottom, offscreen(cash), endOfLine = true)
+    val leftContent = StatusPanel(paddingLeftRight, paddingTopBottom, offscreen(leftText))
+    val rightContent = StatusPanel(paddingLeftRight, paddingTopBottom, offscreen(rightText), endOfLine = true)
 
-    statusPanelBorderPadding(
-        healthContent,
-        healthContent.borderCharacters.topLeft,
-        healthContent.borderCharacters.topRight
-    )
+    scopedState {
+        leftColor()
+        statusPanelBorderPadding(
+            leftContent,
+            leftContent.borderCharacters.topLeft,
+            leftContent.borderCharacters.topRight
+        )
+    }
 
-    statusPanelBorderPadding(
-        cashContent,
-        cashContent.borderCharacters.topLeft,
-        cashContent.borderCharacters.topRight
-    )
+    scopedState {
+        rightColor()
+        statusPanelBorderPadding(
+            rightContent,
+            rightContent.borderCharacters.topLeft,
+            rightContent.borderCharacters.topRight
+        )
+    }
 
-    statusPanelVerticalPadding(healthContent)
+    scopedState {
+        leftColor()
+        statusPanelVerticalPadding(leftContent)
+    }
 
-    statusPanelVerticalPadding(cashContent)
+    scopedState {
+        rightColor()
+        statusPanelVerticalPadding(rightContent)
+    }
 
-    statusPanelRender(healthContent)
+    scopedState {
+        leftColor()
+        statusPanelRender(leftContent)
+    }
 
-    statusPanelRender(cashContent)
+    scopedState {
+        rightColor()
+        statusPanelRender(rightContent)
+    }
 
-    statusPanelVerticalPadding(healthContent)
+    scopedState {
+        leftColor()
+        statusPanelVerticalPadding(leftContent)
+    }
 
-    statusPanelVerticalPadding(healthContent)
+    scopedState {
+        rightColor()
+        statusPanelVerticalPadding(rightContent)
+    }
 
-    statusPanelBorderPadding(
-        healthContent,
-        healthContent.borderCharacters.botLeft,
-        healthContent.borderCharacters.botRight
-    )
+    scopedState {
+        leftColor()
+        statusPanelBorderPadding(
+            leftContent,
+            leftContent.borderCharacters.botLeft,
+            leftContent.borderCharacters.botRight
+        )
+    }
 
-    statusPanelBorderPadding(
-        cashContent,
-        cashContent.borderCharacters.botLeft,
-        cashContent.borderCharacters.botRight
-    )
+    scopedState {
+        rightColor()
+        statusPanelBorderPadding(
+            rightContent,
+            rightContent.borderCharacters.botLeft,
+            rightContent.borderCharacters.botRight
+        )
+    }
 }
