@@ -12,7 +12,13 @@ Press Q (shift-q) to quit terminal
 
 ---
 
-![Krogue](krogue-cap.gif "Krogue")
+## Raycasting
+
+![Raycasting](krogue-cap-raycast.gif "Krogue raycast")
+
+## Shadowcasting
+
+![Shadowcasting](krogue-cap-shadowcast.gif "Krogue shadowcast")
 
 ---
 
