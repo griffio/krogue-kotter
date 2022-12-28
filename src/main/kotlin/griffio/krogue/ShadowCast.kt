@@ -5,9 +5,9 @@ import kotlin.math.ceil
 //  http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting_-_improved
 object ShadowCast {
 
-    data class Octant(val xx: Int, val xy: Int, val yx: Int, val yy: Int)
+    private data class Octant(val xx: Int, val xy: Int, val yx: Int, val yy: Int)
 
-    val octantCoordinates = listOf(
+    private val octantCoordinates = listOf(
         Octant(0, -1, 1, 0),
         Octant(1, 0, 0, -1),
         Octant(1, 0, 0, 1),
@@ -18,7 +18,13 @@ object ShadowCast {
         Octant(0, -1, -1, 0)
     )
 
-    fun castLight(
+    fun renderHeroRadius(heroX: Int, heroY: Int, view: List<MutableList<Tile>>, radius: Int) {
+        for (octantCoordinate in octantCoordinates) {
+            castLight(view, heroX, heroY, radius.toDouble(), 1, 1.0, 0.0, octantCoordinate)
+        }
+    }
+
+    private fun castLight(
         view: List<MutableList<Tile>>, heroX: Int, heroY: Int, viewRadius: Double,
         startColumn: Int, leftSlope: Double, rightSlope: Double, octant: Octant,
     ) {
