@@ -1,6 +1,5 @@
 package griffio.krogue
 
-import com.varabyte.kotter.foundation.timer.addTimer
 import com.varabyte.kotter.foundation.firstSuccess
 import com.varabyte.kotter.foundation.input.Keys
 import com.varabyte.kotter.foundation.input.onKeyPressed
@@ -16,22 +15,21 @@ import com.varabyte.kotterx.decorations.BorderCharacters
 import com.varabyte.kotterx.decorations.bordered
 import griffio.krogue.rooms.TOTAL_CASH
 import griffio.krogue.rooms.generateRooms
-import java.time.Duration
 
-fun generateWorld(): List<MutableList<Tile>> {
-    return generateRooms().map { line ->
-        line.map {
-            when (it) {
-                '#' -> Cave()
-                '.' -> Floor()
-                '^' -> Lava()
-                '~' -> Water()
-                '£' -> Cash()
-                '@' -> Hero
-                else -> error("Unknown tile: $it")
-            }
-        }.toMutableList()
+fun charToTile(char: Char): Tile {
+    return when (char) {
+        '#' -> Cave()
+        '.' -> Floor()
+        '^' -> Lava()
+        '~' -> Water()
+        '£' -> Cash()
+        '@' -> Hero
+        else -> error("Unknown tile: $char")
     }
+}
+
+fun generateWorld(): List<MutableList<Tile>> = generateRooms().map { line ->
+    line.map(::charToTile).toMutableList()
 }
 
 val world: List<MutableList<Tile>> = generateWorld()
@@ -126,7 +124,8 @@ fun main() = session(
             it.slice(xView.min..xView.max).toMutableList()
         }
 
-        RayCast.renderHeroRadius(xhero, yhero, view, 6)
+        //RayCast.renderHeroRadius(xhero, yhero, view, 6)
+        ShadowCast.renderHeroRadius(xhero, yhero, view, 8)
 
         val healthText = "Health: $healthPoints"
         val cashText = "Cash: $cash of $TOTAL_CASH"
@@ -160,7 +159,7 @@ fun main() = session(
         //   }
         .onFinishing { blinkOn = false }
         .runUntilKeyPressed(Keys.Q_UPPER) {
-            addTimer(Duration.ofMillis(1000), repeat = true) { blinkOn = !blinkOn }
+            //addTimer(Duration.ofMillis(1000), repeat = true) { blinkOn = !blinkOn }
             onKeyPressed {
                 when (key) {
 
