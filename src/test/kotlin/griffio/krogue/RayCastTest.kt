@@ -43,7 +43,43 @@ class RayCastTest {
                 s##...sss...s
                 ss....sss...s
                 ss####sssssss
-            """.trimIndent(), result)
+            """.trimIndent(), result
+        )
+
+    }
+
+    private val v7x13 = """
+        #############
+        #...........#
+        #...........#
+        #.....@.....#
+        #...........#
+        #...........#
+        #############
+    """.trimIndent().lines()
+
+    @Test
+    fun castLightRadius() {
+        val view = v7x13.map { it.map(::charToTile).toMutableList() }
+        RayCast.renderHeroRadius(6, 3, view, 3)
+        view[3][6].isVisible = true
+        val result = (view.joinToString("\n") {
+            it.joinToString("") { tile ->
+                if (tile.isVisible) tile.glyph.toString() else "s"
+            }
+        })
+
+        assertEquals(
+            """
+                sss#######sss
+                ss.........ss
+                ss.........ss
+                ss....@....ss
+                ss.........ss
+                ss.........ss
+                sss#######sss
+            """.trimIndent(), result
+        )
 
     }
 }
