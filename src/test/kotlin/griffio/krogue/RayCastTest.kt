@@ -24,11 +24,7 @@ class RayCastTest {
         val view = y11x13.map { it.map(::charToTile).toMutableList() }
         RayCast.renderHeroRadius(6, 5, view, 5)
         view[5][6].isVisible = true
-        val result = (view.joinToString("\n") {
-            it.joinToString("") { tile ->
-                if (tile.isVisible) tile.glyph.toString() else "s"
-            }
-        })
+        val result = view.toFixture()
 
         assertEquals(
             """
@@ -63,11 +59,7 @@ class RayCastTest {
         val view = y7x13.map { it.map(::charToTile).toMutableList() }
         RayCast.renderHeroRadius(6, 3, view, 3)
         view[3][6].isVisible = true
-        val result = (view.joinToString("\n") {
-            it.joinToString("") { tile ->
-                if (tile.isVisible) tile.glyph.toString() else "s"
-            }
-        })
+        val result = view.toFixture()
 
         assertEquals(
             """
