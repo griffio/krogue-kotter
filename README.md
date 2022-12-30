@@ -24,9 +24,9 @@ Press Q (shift-q) to quit terminal
 
 ## Todo
 
-- [ ] Add Health Points to Hero
+- [X] Add Health Points to Hero
 - [ ] Add Time Limit
-- [ ] Hero takes damage from water and lava
+- [X] Hero takes damage from water and lava
 - [ ] Find Treasure before running out of health and time
 
 ---
