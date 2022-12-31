@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.7.20"
+    kotlin("jvm") version "1.8.0"
     application
 }
 
@@ -24,10 +24,13 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
     kotlinOptions.freeCompilerArgs += "-XXLanguage:+RangeUntilOperator"
 }
 
 application {
     mainClass.set("griffio.krogue.MainKt")
+}
+
+kotlin {
+    jvmToolchain(14)
 }
