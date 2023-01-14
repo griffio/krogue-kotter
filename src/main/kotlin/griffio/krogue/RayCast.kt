@@ -53,12 +53,11 @@ object RayCast {
                     break
                 }
 
+                view[roundedY][roundedX].isVisible = true
+
                 if (view[roundedY][roundedX].isOpaque) {
-                    view[roundedY][roundedX].isVisible = true
                     break
                 }
-
-                view[roundedY][roundedX].isVisible = true
             }
         }
     }
