@@ -38,3 +38,5 @@ Press Q (shift-q) to quit terminal
 [FOV using recursive shadowcasting](http://roguebasin.com/index.php/FOV_using_recursive_shadowcasting)
 
 [ironwood](https://github.com/pushcx/ironwood/)
+
+[roguelike_vision_algorithms](http://www.adammil.net/blog/v125_roguelike_vision_algorithms.html)
