@@ -74,4 +74,42 @@ class RayCastTest {
         )
 
     }
+
+    private val y11x23 = """
+        #######################
+        #.....................#
+        #.....................#
+        #.......#.....#.......#
+        #.....................#
+        #.......#..@..#.......#
+        #.....................#
+        #.......#.....#.......#
+        #.....................#
+        #.....................#
+        #######################
+    """.trimIndent().lines()
+
+    @Test
+    fun castLightPillars() {
+        val view = y11x23.map { it.map(::charToTile).toMutableList() }
+        RayCast.renderHeroRadius(11, 5, view, 7)
+        view[5][11].isVisible = true
+        val result = view.toFixture()
+
+        assertEquals(
+            """
+                ssssss###########ssssss
+                ssss.s...........s.ssss
+                sss.................sss
+                sss.....#.....#.....sss
+                sss.................sss
+                ssssssss#..@..#ssssssss
+                sss.................sss
+                sss.....#.....#.....sss
+                sss.................sss
+                ssss.s...........s.ssss
+                ssssss###########ssssss
+            """.trimIndent(), result
+        )
+    }
 }
