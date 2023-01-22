@@ -7,7 +7,7 @@ import java.util.*
 object NonPermissiveShadowCast {
 
     private fun <T> translateOrigin(x: Int, y: Int, f: (Int, Int) -> T): (Int, Int) -> T {
-        return { a: Int, b: Int -> f(a + x, b + y) }
+        return { a: Int, b: Int -> f((a + x).coerceAtLeast(0), (b + y).coerceAtLeast(0)) }
     }
 
     private fun <T> translateOctant(f: (Int, Int) -> T, octant: Int): (Int, Int) -> T {
