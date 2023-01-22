@@ -4,7 +4,7 @@ import java.util.*
 
 // Translated from Shadowcasting in C#
 // https://web.archive.org/web/20150905121206/http://blogs.msdn.com/b/ericlippert/archive/2011/12/29/shadowcasting-in-c-part-six.aspx
-object PermissiveShadowCast {
+object NonPermissiveShadowCast {
 
     private fun <T> translateOrigin(x: Int, y: Int, f: (Int, Int) -> T): (Int, Int) -> T {
         return { a: Int, b: Int -> f(a + x, b + y) }
@@ -42,8 +42,13 @@ object PermissiveShadowCast {
         heroX: Int, heroY: Int,
         view: List<MutableList<Tile>>, radius: Int,
     ) {
-        val isOpaque = { x: Int, y: Int -> view[y][x].isOpaque }
-        val setVisible = { x: Int, y: Int -> view[y][x].isVisible = true }
+        val isOpaque = { x: Int, y: Int ->
+            view[y][x].isOpaque
+        }
+
+        val setVisible = { x: Int, y: Int ->
+             view[y][x].isVisible = true
+        }
 
         val opaque = translateOrigin(heroX, heroY, isOpaque)
         val fov = translateOrigin(heroX, heroY, setVisible)
