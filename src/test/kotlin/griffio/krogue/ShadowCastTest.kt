@@ -44,37 +44,6 @@ class ShadowCastTest {
 
     }
 
-    private val y7x13 = """
-        #############
-        #...........#
-        #...........#
-        #.....@.....#
-        #...........#
-        #...........#
-        #############
-    """.trimIndent().lines()
-
-    @Test
-    fun castLightRadius() {
-        val view = y7x13.map { it.map(::charToTile).toMutableList() }
-        ShadowCast2.renderHeroRadius(6, 3, view, 4)
-        view[3][6].isVisible = true
-        val result = view.toFixture()
-
-        assertEquals(
-            """
-               ssssss#ssssss
-               ssss.....ssss
-               ssss.....ssss
-               sss...@...sss
-               ssss.....ssss
-               ssss.....ssss
-               ssssss#ssssss
-            """.trimIndent(), result
-        )
-
-    }
-
     private val y11x23 = """
         #######################
         #.....................#

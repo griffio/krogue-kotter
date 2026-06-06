@@ -201,9 +201,7 @@ fun main() = session(
             it.slice(xView.min..xView.max).toMutableList()
         }
 
-        //RayCast.renderHeroRadius(xhero, yhero, view, 6)
-         ShadowCast.renderHeroRadius(xhero, yhero, view, 8)
-        //PermissiveShadowCast.renderHeroRadius(xhero, yhero, view, 8)
+        ShadowCast.renderHeroRadius(xhero, yhero, view, 8)
 
         val healthText = "Health: $healthPoints"
         val cashText = "Cash: $cash of $TOTAL_CASH"
