@@ -15,6 +15,7 @@ import com.varabyte.kotterx.decorations.BorderCharacters
 import com.varabyte.kotterx.decorations.bordered
 import griffio.krogue.rooms.TOTAL_CASH
 import griffio.krogue.rooms.generateRooms
+import kotlin.math.abs
 
 fun charToTile(char: Char): Tile {
     return when (char) {
@@ -33,6 +34,8 @@ fun generateWorld(): List<MutableList<Tile>> = generateRooms().map { line ->
 }
 
 val gameState = GameState()
+
+const val HERO_ATTACK = 2
 
 data class View(val min: Int, val max: Int)
 
@@ -94,9 +97,64 @@ fun main() = session(
     var cash by liveVarOf(0)
     var status by liveVarOf(GameStatus.PLAYING)
 
-    fun tryMoveHero(tile: Tile, move: () -> Unit) {
+    fun monsterAt(worldX: Int, worldY: Int): Monster? =
+        gameState.monsters.firstOrNull { it.x == worldX && it.y == worldY }
+
+    // A monster may step onto any non-opaque, unoccupied, in-bounds tile.
+    fun canStep(worldX: Int, worldY: Int, self: Monster): Boolean {
+        val tile = gameState.world.getOrNull(worldY)?.getOrNull(worldX) ?: return false
+        if (tile.isOpaque) return false
+        return gameState.monsters.none { it !== self && it.x == worldX && it.y == worldY }
+    }
+
+    // One monster turn: visible monsters chase the hero (orthogonally, dominant
+    // axis first); unseen ones wander. Stepping into the hero is a melee attack.
+    fun monstersAct() {
+        if (status != GameStatus.PLAYING) return
+        val heroWX = xView.min + xhero
+        val heroWY = yView.min + yhero
+
+        for (m in gameState.monsters) {
+            val canSeeHero = gameState.world.getOrNull(m.y)?.getOrNull(m.x)?.isVisible == true
+            val steps: List<Pair<Int, Int>> = if (canSeeHero) {
+                val dx = (heroWX - m.x).coerceIn(-1, 1)
+                val dy = (heroWY - m.y).coerceIn(-1, 1)
+                if (abs(heroWX - m.x) >= abs(heroWY - m.y)) listOf(dx to 0, 0 to dy)
+                else listOf(0 to dy, dx to 0)
+            } else {
+                listOf(listOf(-1, 0, 1).random() to listOf(-1, 0, 1).random())
+            }
+
+            for ((sx, sy) in steps) {
+                if (sx == 0 && sy == 0) continue
+                val nx = m.x + sx
+                val ny = m.y + sy
+                if (nx == heroWX && ny == heroWY) {
+                    healthPoints = (healthPoints - m.attack).coerceAtLeast(0)
+                    if (healthPoints < 1) status = GameStatus.LOST
+                    break
+                }
+                if (canStep(nx, ny, m)) {
+                    m.x = nx
+                    m.y = ny
+                    break
+                }
+            }
+        }
+    }
+
+    fun tryMoveHero(tile: Tile, destX: Int, destY: Int, move: () -> Unit) {
 
         if (status != GameStatus.PLAYING) return
+
+        // Bump-to-attack: moving into a monster strikes it instead of moving.
+        val monster = monsterAt(destX, destY)
+        if (monster != null) {
+            monster.hp -= HERO_ATTACK
+            if (monster.hp <= 0) gameState.monsters.remove(monster)
+            monstersAct()
+            return
+        }
 
         if (tile is Cash) {
             cash += 1
@@ -106,7 +164,10 @@ fun main() = session(
         if (tile is Lava) healthPoints = (healthPoints - 6).coerceAtLeast(0)
         if (tile is Water) healthPoints = (healthPoints - 1).coerceAtLeast(0)
         if (healthPoints < 1) status = GameStatus.LOST
-        if (status == GameStatus.PLAYING && !tile.isOpaque) move()
+        if (status == GameStatus.PLAYING && !tile.isOpaque) {
+            move()
+            monstersAct()
+        }
     }
 
     section {
@@ -163,11 +224,15 @@ fun main() = session(
             bordered(BorderCharacters.CURVED, paddingLeftRight = 1, paddingTopBottom = 1) {
                 view.mapIndexed { y, rows ->
                     rows.mapIndexed { x, tile ->
-                        //  if (yhero == y + 1 && xhero == x + 1) { text(spinnerAnim) }
-                        if (yhero == y && xhero == x) render(Hero, false)
-                        else if (tile.isVisible) render(tile, if (tile is Lava) blinkOn else false)
-                        else if (tile.isExplored) color(8) { text(tile.glyph) } // dim fog-of-war memory
-                        else text(Empty.glyph)
+                        // view (x, y) -> world coords for monster lookup
+                        val monster = if (tile.isVisible) monsterAt(xView.min + x, yView.min + y) else null
+                        when {
+                            yhero == y && xhero == x -> render(Hero, false)
+                            monster != null -> color(monster.color) { text(monster.glyph) }
+                            tile.isVisible -> render(tile, if (tile is Lava) blinkOn else false)
+                            tile.isExplored -> color(8) { text(tile.glyph) } // dim fog-of-war memory
+                            else -> text(Empty.glyph)
+                        }
                     }
                     textLine()
                 }
@@ -198,7 +263,7 @@ fun main() = session(
 
                     Keys.W -> {
                         // Can move across Floor tiles only
-                        tryMoveHero(gameState.world[yView.min + yhero - 1][xView.min + xhero]) {
+                        tryMoveHero(gameState.world[yView.min + yhero - 1][xView.min + xhero], xView.min + xhero, yView.min + yhero - 1) {
                             // range prior to moving hero used to scroll top or bottom position
                             val yMinPrev = yView.min
 
@@ -213,7 +278,7 @@ fun main() = session(
                     }
 
                     Keys.S -> {
-                        tryMoveHero(gameState.world[yView.min + yhero + 1][xView.min + xhero]) {
+                        tryMoveHero(gameState.world[yView.min + yhero + 1][xView.min + xhero], xView.min + xhero, yView.min + yhero + 1) {
                             val yPrev = yView.max
 
                             yView = if (yhero == yMaxIndex / 4) incView(yView, 1, yMaxIndex) else yView
@@ -224,7 +289,7 @@ fun main() = session(
                     }
 
                     Keys.A -> {
-                        tryMoveHero(gameState.world[yView.min + yhero][xView.min + xhero - 1]) {
+                        tryMoveHero(gameState.world[yView.min + yhero][xView.min + xhero - 1], xView.min + xhero - 1, yView.min + yhero) {
                             val xPrev = xView.min
 
                             xView = if (xhero == xMaxIndex / 4) decView(xView, 1, 0) else xView
@@ -234,7 +299,7 @@ fun main() = session(
                     }
 
                     Keys.D -> {
-                        tryMoveHero(gameState.world[yView.min + yhero][xView.min + xhero + 1]) {
+                        tryMoveHero(gameState.world[yView.min + yhero][xView.min + xhero + 1], xView.min + xhero + 1, yView.min + yhero) {
                             val xPrev = xView.max
 
                             xView = if (xhero == xMaxIndex / 4) incView(xView, 1, xMaxIndex) else xView
