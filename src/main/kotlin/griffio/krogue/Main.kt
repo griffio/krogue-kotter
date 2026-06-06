@@ -51,7 +51,11 @@ sealed class Tile(
     var isVisible: Boolean,
     var isOpaque: Boolean,
     var isTaken: Boolean,
-)
+) {
+    // Set once a tile has entered the hero's light radius; stays true so
+    // previously seen terrain can be drawn dimmed (fog of war).
+    var isExplored: Boolean = false
+}
 
 class Floor() : Tile('.', 15, false, false, false)
 class Cave() : Tile('#', 7, false, true, false)
@@ -162,6 +166,7 @@ fun main() = session(
                         //  if (yhero == y + 1 && xhero == x + 1) { text(spinnerAnim) }
                         if (yhero == y && xhero == x) render(Hero, false)
                         else if (tile.isVisible) render(tile, if (tile is Lava) blinkOn else false)
+                        else if (tile.isExplored) color(8) { text(tile.glyph) } // dim fog-of-war memory
                         else text(Empty.glyph)
                     }
                     textLine()

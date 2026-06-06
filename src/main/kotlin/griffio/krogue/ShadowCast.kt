@@ -104,6 +104,7 @@ object ShadowCast {
                 val tile = view[viewY][viewX]
                 if (distanceSquared <= viewRadiusSq) {
                     tile.isVisible = true
+                    tile.isExplored = true
                 }
                 val curBlocked = tile.isOpaque
                 if (prevWasBlocked) {
