@@ -18,6 +18,7 @@ fun generateRooms(): List<List<Char>> {
     val width = dimensions.random()
     val height = dimensions.random()
     tiles = MutableList(height) { MutableList(width) { '#' } }
+    rooms = mutableListOf() // reset so regenerated maps don't inherit stale rooms
 
     var top = (1..height - MIN_DIM - 2).random()
     var bottom = top + (MIN_DIM..min(MAX_DIM, height - top - 2)).random()

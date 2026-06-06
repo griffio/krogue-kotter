@@ -119,8 +119,8 @@ class NonPermissiveShadowCastTest {
         #...........#
         #...........#
         #...........#
-        #...........#
-        #...........#
+        #.....#.....#
+        #....###....#
         #...........#
         #############
     """.trimIndent().lines()
@@ -128,7 +128,7 @@ class NonPermissiveShadowCastTest {
     @Test
     fun castLightRadiusOffCentre() {
         val view = y7x15.map { it.map(::charToTile).toMutableList() }
-        NonPermissiveShadowCast.renderHeroRadius(6, 1, view, 3)
+        NonPermissiveShadowCast.renderHeroRadius(6, 1, view, 8)
         view[1][6].isVisible = true
         val result = view.toFixture()
 
@@ -153,8 +153,8 @@ class NonPermissiveShadowCastTest {
         #.....................#
         #.....................#
         #.......#.....#.......#
-        #.....................#
-        #.......#@....#.......#
+        #........@............#
+        #.......#.....#.......#
         #.....................#
         #.......#.....#.......#
         #.....................#

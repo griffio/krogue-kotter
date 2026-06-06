@@ -32,7 +32,7 @@ fun generateWorld(): List<MutableList<Tile>> = generateRooms().map { line ->
     line.map(::charToTile).toMutableList()
 }
 
-val world: List<MutableList<Tile>> = generateWorld()
+val gameState = GameState()
 
 data class View(val min: Int, val max: Int)
 
@@ -67,8 +67,9 @@ fun RenderScope.render(t: Tile, isInverted: Boolean) {
     clearInvert()
 }
 
-val HEIGHT = world.size
-val WIDTH = world[0].size
+// Terminal size is fixed for the process from the first generated world.
+val HEIGHT = gameState.height
+val WIDTH = gameState.width
 
 fun main() = session(
     terminal = listOf(
@@ -77,8 +78,9 @@ fun main() = session(
     ).firstSuccess(),
     clearTerminal = true,
 ) {
-    val xMaxIndex = WIDTH - 1
-    val yMaxIndex = HEIGHT - 1
+    // var (not val): a regenerated world on restart may have different dimensions.
+    var xMaxIndex = WIDTH - 1
+    var yMaxIndex = HEIGHT - 1
     var xView by liveVarOf(0 xy xMaxIndex / 2)
     var yView by liveVarOf(0 xy yMaxIndex / 2)
     var xhero by liveVarOf(xMaxIndex / 4)
@@ -86,21 +88,21 @@ fun main() = session(
     var blinkOn by liveVarOf(false)
     var healthPoints by liveVarOf((8..16).random())
     var cash by liveVarOf(0)
+    var status by liveVarOf(GameStatus.PLAYING)
 
     fun tryMoveHero(tile: Tile, move: () -> Unit) {
 
-        if (healthPoints < 1) {
-            Hero.colorIndex = 9
-            return
-        }
+        if (status != GameStatus.PLAYING) return
 
         if (tile is Cash) {
             cash += 1
             tile.isTaken = true
+            if (cash == TOTAL_CASH) status = GameStatus.WON
         }
         if (tile is Lava) healthPoints = (healthPoints - 6).coerceAtLeast(0)
         if (tile is Water) healthPoints = (healthPoints - 1).coerceAtLeast(0)
-        if (!tile.isOpaque) move()
+        if (healthPoints < 1) status = GameStatus.LOST
+        if (status == GameStatus.PLAYING && !tile.isOpaque) move()
     }
 
     section {
@@ -110,17 +112,27 @@ fun main() = session(
     section {
         // section is rendered on each move
 
-        for ((indexY, row) in world.withIndex()) {
+        if (status != GameStatus.PLAYING) {
+            bordered(BorderCharacters.CURVED, paddingLeftRight = 2, paddingTopBottom = 1) {
+                if (status == GameStatus.WON) green(isBright = true) { textLine("YOU WIN!") }
+                else red(isBright = true) { textLine("YOU DIED") }
+                textLine("Score: $cash of $TOTAL_CASH")
+                textLine("Press R to restart · Q to quit")
+            }
+            return@section
+        }
+
+        for ((indexY, row) in gameState.world.withIndex()) {
             for ((indexX, _) in row.withIndex()) {
-                world[indexY][indexX].isVisible = false // hide all tiles - visible radius is based on hero position
-                if (world[indexY][indexX].isTaken) {
-                    world[indexY][indexX] = Floor()
+                gameState.world[indexY][indexX].isVisible = false // hide all tiles - visible radius is based on hero position
+                if (gameState.world[indexY][indexX].isTaken) {
+                    gameState.world[indexY][indexX] = Floor()
                 }
             }
         }
 
         // current view where tiles can be updated
-        val view = world.slice(yView.min..yView.max).map {
+        val view = gameState.world.slice(yView.min..yView.max).map {
             it.slice(xView.min..xView.max).toMutableList()
         }
 
@@ -165,12 +177,23 @@ fun main() = session(
                 when (key) {
 
                     Keys.R_UPPER -> {
-
+                        if (status != GameStatus.PLAYING) {
+                            gameState.regenerate()
+                            xMaxIndex = gameState.width - 1
+                            yMaxIndex = gameState.height - 1
+                            xView = 0 xy xMaxIndex / 2
+                            yView = 0 xy yMaxIndex / 2
+                            xhero = xMaxIndex / 4
+                            yhero = yMaxIndex / 4
+                            healthPoints = (8..16).random()
+                            cash = 0
+                            status = GameStatus.PLAYING
+                        }
                     }
 
                     Keys.W -> {
                         // Can move across Floor tiles only
-                        tryMoveHero(world[yView.min + yhero - 1][xView.min + xhero]) {
+                        tryMoveHero(gameState.world[yView.min + yhero - 1][xView.min + xhero]) {
                             // range prior to moving hero used to scroll top or bottom position
                             val yMinPrev = yView.min
 
@@ -185,7 +208,7 @@ fun main() = session(
                     }
 
                     Keys.S -> {
-                        tryMoveHero(world[yView.min + yhero + 1][xView.min + xhero]) {
+                        tryMoveHero(gameState.world[yView.min + yhero + 1][xView.min + xhero]) {
                             val yPrev = yView.max
 
                             yView = if (yhero == yMaxIndex / 4) incView(yView, 1, yMaxIndex) else yView
@@ -196,7 +219,7 @@ fun main() = session(
                     }
 
                     Keys.A -> {
-                        tryMoveHero(world[yView.min + yhero][xView.min + xhero - 1]) {
+                        tryMoveHero(gameState.world[yView.min + yhero][xView.min + xhero - 1]) {
                             val xPrev = xView.min
 
                             xView = if (xhero == xMaxIndex / 4) decView(xView, 1, 0) else xView
@@ -206,7 +229,7 @@ fun main() = session(
                     }
 
                     Keys.D -> {
-                        tryMoveHero(world[yView.min + yhero][xView.min + xhero + 1]) {
+                        tryMoveHero(gameState.world[yView.min + yhero][xView.min + xhero + 1]) {
                             val xPrev = xView.max
 
                             xView = if (xhero == xMaxIndex / 4) incView(xView, 1, xMaxIndex) else xView

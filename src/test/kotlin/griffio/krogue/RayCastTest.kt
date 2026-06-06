@@ -79,36 +79,57 @@ class RayCastTest {
         #######################
         #.....................#
         #.....................#
-        #.......#.....#.......#
-        #.....................#
-        #.......#..@..#.......#
-        #.....................#
-        #.......#.....#.......#
-        #.....................#
-        #.....................#
+        #.........#...........#
+        #..........@..........#
         #######################
     """.trimIndent().lines()
 
     @Test
     fun castLightPillars() {
         val view = y11x23.map { it.map(::charToTile).toMutableList() }
-        RayCast.renderHeroRadius(11, 5, view, 7)
-        view[5][11].isVisible = true
+        RayCast.renderHeroRadius(11, 4, view, 5)
+        view[4][11].isVisible = true
         val result = view.toFixture()
 
         assertEquals(
             """
-                ssssss###########ssssss
-                ssss.s...........s.ssss
-                sss.................sss
-                sss.....#.....#.....sss
-                sss.................sss
-                ssssssss#..@..#ssssssss
-                sss.................sss
-                sss.....#.....#.....sss
-                sss.................sss
-                ssss.s...........s.ssss
-                ssssss###########ssssss
+                #######################
+                #.....................#
+                #........s............#
+                #.........#...........#
+                #..........@..........#
+                #######################
+            """.trimIndent(), result
+        )
+    }
+
+    private val y9x15 = """
+           ###############
+           #.............#
+           #.............#
+           #......########
+           #.......@.....#
+           #......########
+           #.............#
+           #.............#
+           ###############
+    """.trimIndent().lines()
+
+    @Test
+    fun castLight9x15() {
+        val view = y9x15.map { it.map(::charToTile).toMutableList() }
+        RayCast.renderHeroRadius(11, 4, view, 10)
+        view[4][11].isVisible = true
+        val result = view.toFixture()
+
+        assertEquals(
+            """
+                #######################
+                #.....................#
+                #........s............#
+                #.........#...........#
+                #..........@..........#
+                #######################
             """.trimIndent(), result
         )
     }
