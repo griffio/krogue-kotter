@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.8.10"
+    kotlin("jvm") version "2.4.0"
     application
 }
 
@@ -13,8 +13,8 @@ repositories {
 }
 
 dependencies {
-    implementation("com.varabyte.kotter:kotter:1.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
+    implementation("com.varabyte.kotter:kotter:1.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.11.0")
 
     testImplementation(kotlin("test"))
 }
@@ -24,7 +24,7 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.freeCompilerArgs += "-XXLanguage:+RangeUntilOperator"
+   // kotlinOptions.freeCompilerArgs += "-XXLanguage:+RangeUntilOperator"
 }
 
 application {
@@ -32,5 +32,5 @@ application {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(21)
 }
